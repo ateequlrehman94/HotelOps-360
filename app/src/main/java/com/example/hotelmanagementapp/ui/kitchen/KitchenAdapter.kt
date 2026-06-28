@@ -1,9 +1,13 @@
 package com.example.hotelmanagementapp.ui.kitchen
 
+import android.app.AlertDialog
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hotelmanagementapp.R
@@ -12,7 +16,8 @@ import com.example.hotelmanagementapp.data.model.Order
 class KitchenAdapter(
     private val onReady: (Order) -> Unit,
     private val onPaid: (Order) -> Unit,
-    private val onCancel: (Order) -> Unit
+    private val onCancel: (Order) -> Unit,
+    private val onDuePayment: (Order, String, String) -> Unit
 ) : RecyclerView.Adapter<KitchenAdapter.OrderViewHolder>() {
 
     private var orders = listOf<Order>()
@@ -43,10 +48,12 @@ class KitchenAdapter(
         private val btnReady: Button = itemView.findViewById(R.id.btnReady)
         private val btnPaid: Button = itemView.findViewById(R.id.btnPaid)
         private val btnCancel: Button = itemView.findViewById(R.id.btnCancel)
+        private val btnDuePayment: Button = itemView.findViewById(R.id.btnDuePayment)
 
         fun bind(order: Order) {
             tvOrderLabel.text = if (order.orderType == "table")
-                "Table ${order.tableNumber}" else order.customerName ?: "Open Order"
+                "🪑 Table ${order.tableNumber}"
+            else "🛍 ${order.customerName ?: "Open Order"}"
 
             tvStatus.text = when (order.status) {
                 "pending" -> "Pending"
@@ -59,20 +66,55 @@ class KitchenAdapter(
             )
 
             tvTotal.text = "Rs. ${order.totalAmount}"
-
             val mins = ((System.currentTimeMillis() - order.createdAt) / 60000).toInt()
             tvTime.text = "${mins}m ago"
-
-            if (order.note.isNotEmpty()) {
-                tvItems.text = "Note: ${order.note}"
-            } else {
-                tvItems.text = if (order.orderType == "table") "Table Order" else "Open Order"
-            }
+            tvItems.text = if (order.note.isNotEmpty()) "📝 ${order.note}" else ""
 
             btnReady.visibility = if (order.status == "pending") View.VISIBLE else View.GONE
             btnReady.setOnClickListener { onReady(order) }
             btnPaid.setOnClickListener { onPaid(order) }
             btnCancel.setOnClickListener { onCancel(order) }
+
+            btnDuePayment.setOnClickListener {
+                showDuePaymentDialog(itemView.context, order)
+            }
+        }
+
+        private fun showDuePaymentDialog(context: Context, order: Order) {
+            val layout = LinearLayout(context)
+            layout.orientation = LinearLayout.VERTICAL
+            layout.setPadding(50, 30, 50, 10)
+
+            val nameLabel = TextView(context)
+            nameLabel.text = "Customer Name:"
+            layout.addView(nameLabel)
+
+            val etName = EditText(context)
+            etName.hint = "Enter customer name"
+            if (order.customerName != null) etName.setText(order.customerName)
+            layout.addView(etName)
+
+            val phoneLabel = TextView(context)
+            phoneLabel.text = "Phone Number:"
+            layout.addView(phoneLabel)
+
+            val etPhone = EditText(context)
+            etPhone.hint = "03xxxxxxxxx"
+            etPhone.inputType = android.text.InputType.TYPE_CLASS_PHONE
+            layout.addView(etPhone)
+
+            AlertDialog.Builder(context)
+                .setTitle("⏰ Due Payment — Rs. ${order.totalAmount}")
+                .setMessage("Customer will pay later. Enter details:")
+                .setView(layout)
+                .setPositiveButton("Mark as Due") { _, _ ->
+                    val name = etName.text.toString().trim()
+                        .ifEmpty { order.customerName ?: "Unknown" }
+                    val phone = etPhone.text.toString().trim()
+                    onDuePayment(order, name, phone)
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
     }
 }

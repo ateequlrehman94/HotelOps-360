@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📋 History"
+            android:text="📋 History &amp; Reports"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold"/>
@@ -35,9 +35,9 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="3dp"
             android:text="Today"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:backgroundTint="#533AB7"/>
 
         <Button
@@ -45,9 +45,9 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="3dp"
             android:text="Yesterday"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:backgroundTint="#888780"/>
 
         <Button
@@ -55,9 +55,9 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:text="Week"
-            android:textSize="11sp"
+            android:layout_marginEnd="3dp"
+            android:text="This Week"
+            android:textSize="10sp"
             android:backgroundTint="#888780"/>
 
         <Button
@@ -65,8 +65,8 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_weight="1"
-            android:text="Month"
-            android:textSize="11sp"
+            android:text="This Month"
+            android:textSize="10sp"
             android:backgroundTint="#888780"/>
 
     </LinearLayout>
@@ -209,6 +209,112 @@
                 </LinearLayout>
 
             </GridLayout>
+
+            <!-- Profit Loss Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:layout_margin="8dp"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📊 Profit / Loss"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total Sales:"
+                        android:textSize="13sp"/>
+
+                    <TextView
+                        android:id="@+id/tvPLSales"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rs. 0"
+                        android:textSize="13sp"
+                        android:textColor="#1D9E75"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total Expenses:"
+                        android:textSize="13sp"/>
+
+                    <TextView
+                        android:id="@+id/tvPLExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rs. 0"
+                        android:textSize="13sp"
+                        android:textColor="#E24B4A"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#EEEEEE"
+                    android:layout_marginBottom="6dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Net Profit/Loss:"
+                        android:textStyle="bold"
+                        android:textSize="15sp"/>
+
+                    <TextView
+                        android:id="@+id/tvPLNet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rs. 0"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#1D9E75"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvPendingDues"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⏰ Pending Dues: Rs. 0"
+                    android:textSize="12sp"
+                    android:textColor="#854F0B"
+                    android:layout_marginTop="8dp"/>
+
+            </LinearLayout>
 
             <!-- Orders List -->
             <LinearLayout

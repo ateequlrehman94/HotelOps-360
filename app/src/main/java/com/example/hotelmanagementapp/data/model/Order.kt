@@ -10,8 +10,12 @@ data class Order(
     val orderType: String,
     val tableNumber: Int? = null,
     val customerName: String? = null,
+    val customerPhone: String? = null,
     val totalAmount: Int,
+    val paidAmount: Int = 0,
     val note: String = "",
     val status: String = "pending",
-    val createdAt: Long = System.currentTimeMillis()
+    val paymentStatus: String = "unpaid",
+    val createdAt: Long = System.currentTimeMillis(),
+    val paidAt: Long? = null
 )

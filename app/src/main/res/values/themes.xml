@@ -1,6 +1,10 @@
 <resources>
-    <style name="Theme.Hotelmanagementapp" parent="Theme.MaterialComponents.DayNight.NoActionBar">        <item name="colorPrimary">#533AB7</item>
-        <item name="colorPrimaryDark">#3C3489</item>
-        <item name="colorAccent">#1D9E75</item>
+    <style name="Theme.Hotelmanagementapp" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">#533AB7</item>
+        <item name="colorPrimaryVariant">#3C3489</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#1D9E75</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="android:statusBarColor">#533AB7</item>
     </style>
 </resources>
