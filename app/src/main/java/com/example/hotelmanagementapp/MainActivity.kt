@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.hotelmanagementapp.databinding.ActivityMainBinding
+import androidx.navigation.NavOptions
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,6 +19,28 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-        binding.bottomNavigation.setupWithNavController(navController)
+
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            val navOptions = NavOptions.Builder()
+                .setPopUpTo(R.id.nav_graph, true)
+                .setLaunchSingleTop(true)
+                .build()
+
+            when (item.itemId) {
+                R.id.homeFragment -> {
+                    navController.navigate(R.id.homeFragment, null, navOptions)
+                    true
+                }
+                R.id.orderFragment -> {
+                    navController.navigate(R.id.orderFragment, null, navOptions)
+                    true
+                }
+                R.id.kitchenFragment -> {
+                    navController.navigate(R.id.kitchenFragment, null, navOptions)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 }
