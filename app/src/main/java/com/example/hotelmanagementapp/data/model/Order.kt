@@ -16,6 +16,8 @@ data class Order(
     val note: String = "",
     val status: String = "pending",
     val paymentStatus: String = "unpaid",
+    val waiterId: Int = 0,
+    val waiterName: String = "",
     val createdAt: Long = System.currentTimeMillis(),
     val paidAt: Long? = null
 )

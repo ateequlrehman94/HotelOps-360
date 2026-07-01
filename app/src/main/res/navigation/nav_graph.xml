@@ -4,7 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/loginFragment">
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.hotelmanagementapp.ui.users.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login"/>
 
     <fragment
         android:id="@+id/homeFragment"
@@ -53,5 +58,25 @@
         android:name="com.example.hotelmanagementapp.ui.inventory.InventoryFragment"
         android:label="Inventory"
         tools:layout="@layout/fragment_inventory"/>
+
+
+
+    <fragment
+        android:id="@+id/userManagementFragment"
+        android:name="com.example.hotelmanagementapp.ui.users.UserManagementFragment"
+        android:label="User Management"
+        tools:layout="@layout/fragment_user_management"/>
+
+    <fragment
+        android:id="@+id/auditFragment"
+        android:name="com.example.hotelmanagementapp.ui.users.AuditFragment"
+        android:label="Audit Trail"
+        tools:layout="@layout/fragment_audit"/>
+
+    <action
+        app:startDestination="@id/loginFragment"
+        app:destination="@id/homeFragment"
+        app:popUpTo="@id/loginFragment"
+        app:popUpToInclusive="true"/>
 
 </navigation>

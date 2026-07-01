@@ -8,14 +8,15 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.hotelmanagementapp.data.repository.FirebaseDue
 import com.example.hotelmanagementapp.databinding.FragmentDuesBinding
 
 class DuesFragment : Fragment() {
 
     private var _binding: FragmentDuesBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: DueViewModel by viewModels()
-    private lateinit var adapter: DuesAdapter
+    private val viewModel: FirebaseDueViewModel by viewModels()
+    private lateinit var adapter: FirebaseDuesAdapter
     private var showAll = false
 
     override fun onCreateView(
@@ -30,21 +31,21 @@ class DuesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = DuesAdapter(
+        adapter = FirebaseDuesAdapter(
             onMarkPaid = { due ->
                 viewModel.markAsPaid(due.id)
                 Toast.makeText(requireContext(),
                     "✅ ${due.customerName} paid Rs. ${due.totalAmount}",
                     Toast.LENGTH_SHORT).show()
             },
-            onDelete = { due -> viewModel.deleteDue(due) }
+            onDelete = { due -> viewModel.deleteDue(due.id) }
         )
 
         binding.rvDues.layoutManager = LinearLayoutManager(requireContext())
         binding.rvDues.adapter = adapter
 
         viewModel.totalDueAmount.observe(viewLifecycleOwner) { amount ->
-            binding.tvTotalDue.text = "Total Due: Rs. ${amount ?: 0}"
+            binding.tvTotalDue.text = "Total Due: Rs. ${amount}"
         }
 
         viewModel.dueCount.observe(viewLifecycleOwner) { count ->

@@ -11,20 +11,19 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.hotelmanagementapp.R
-import com.example.hotelmanagementapp.data.model.MenuItem
-import com.example.hotelmanagementapp.data.model.Order
-import com.example.hotelmanagementapp.data.model.OrderItem
+import com.example.hotelmanagementapp.data.repository.FirebaseMenuItem
+import com.example.hotelmanagementapp.data.repository.FirebaseOrder
+import com.example.hotelmanagementapp.data.repository.FirebaseOrderItem
 import com.example.hotelmanagementapp.databinding.FragmentOrderBinding
 
 class OrderFragment : Fragment() {
 
     private var _binding: FragmentOrderBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: OrderViewModel by viewModels()
+    private val viewModel: FirebaseOrderViewModel by viewModels()
 
-    private val cart = mutableMapOf<Int, Int>()
-    private var menuItems = listOf<MenuItem>()
+    private val cart = mutableMapOf<String, Int>()
+    private var menuItems = listOf<FirebaseMenuItem>()
     private var selectedTable = 1
 
     override fun onCreateView(
@@ -41,32 +40,54 @@ class OrderFragment : Fragment() {
 
         setupTableButtons()
         setupOrderTypeToggle()
-        observeMenu()
+
+        viewModel.menuItems.observe(viewLifecycleOwner) { items ->
+            menuItems = items
+            buildMenuGrid(items)
+        }
+
+        viewModel.orderResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Toast.makeText(requireContext(),
+                    "✅ Order placed successfully!", Toast.LENGTH_SHORT).show()
+                cart.clear()
+                buildMenuGrid(menuItems)
+                updateSummary()
+                binding.etNote.setText("")
+                binding.etCustomerName?.setText("")
+            } else {
+                Toast.makeText(requireContext(),
+                    "❌ Failed to place order. Check internet.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         setupButtons()
     }
 
     private fun setupTableButtons() {
-        val tableLayout = binding.tableButtonsLayout
-        tableLayout.removeAllViews()
-        for (i in 1..5) {
-            val btn = Button(requireContext())
-            btn.text = "T$i"
-            btn.textSize = 12f
-            val params = LinearLayout.LayoutParams(120, 80)
-            params.marginEnd = 8
-            btn.layoutParams = params
-            if (i == selectedTable) {
-                btn.setBackgroundColor(0xFF533AB7.toInt())
-                btn.setTextColor(0xFFFFFFFF.toInt())
-            } else {
-                btn.setBackgroundColor(0xFFEEEEEE.toInt())
-                btn.setTextColor(0xFF000000.toInt())
+        val tableButtons = listOf(
+            binding.btnT1, binding.btnT2, binding.btnT3, binding.btnT4,
+            binding.btnT5, binding.btnT6, binding.btnT7, binding.btnT8
+        )
+        tableButtons.forEachIndexed { index, button ->
+            val tableNum = index + 1
+            updateTableButtonColor(button, tableNum == selectedTable)
+            button.setOnClickListener {
+                selectedTable = tableNum
+                tableButtons.forEachIndexed { i, btn ->
+                    updateTableButtonColor(btn, i + 1 == selectedTable)
+                }
             }
-            btn.setOnClickListener {
-                selectedTable = i
-                setupTableButtons()
-            }
-            tableLayout.addView(btn)
+        }
+    }
+
+    private fun updateTableButtonColor(button: Button, isSelected: Boolean) {
+        if (isSelected) {
+            button.setBackgroundColor(0xFF533AB7.toInt())
+            button.setTextColor(0xFFFFFFFF.toInt())
+        } else {
+            button.setBackgroundColor(0xFFEEEEEE.toInt())
+            button.setTextColor(0xFF000000.toInt())
         }
     }
 
@@ -77,23 +98,22 @@ class OrderFragment : Fragment() {
         }
     }
 
-    private fun observeMenu() {
-        viewModel.allMenuItems.observe(viewLifecycleOwner) { items ->
-            menuItems = items
-            buildMenuGrid(items)
-        }
-    }
-
-    private fun buildMenuGrid(items: List<MenuItem>) {
+    private fun buildMenuGrid(items: List<FirebaseMenuItem>) {
         val grid = binding.menuGrid
         grid.removeAllViews()
         items.forEach { item ->
-            val cardView = layoutInflater.inflate(R.layout.item_menu_card, grid, false)
-            val tvName = cardView.findViewById<TextView>(R.id.tvItemName)
-            val tvPrice = cardView.findViewById<TextView>(R.id.tvItemPrice)
-            val tvQty = cardView.findViewById<TextView>(R.id.tvQty)
-            val btnMinus = cardView.findViewById<Button>(R.id.btnMinus)
-            val btnPlus = cardView.findViewById<Button>(R.id.btnPlus)
+            val cardView = layoutInflater.inflate(
+                com.example.hotelmanagementapp.R.layout.item_menu_card, grid, false)
+            val tvName = cardView.findViewById<TextView>(
+                com.example.hotelmanagementapp.R.id.tvItemName)
+            val tvPrice = cardView.findViewById<TextView>(
+                com.example.hotelmanagementapp.R.id.tvItemPrice)
+            val tvQty = cardView.findViewById<TextView>(
+                com.example.hotelmanagementapp.R.id.tvQty)
+            val btnMinus = cardView.findViewById<Button>(
+                com.example.hotelmanagementapp.R.id.btnMinus)
+            val btnPlus = cardView.findViewById<Button>(
+                com.example.hotelmanagementapp.R.id.btnPlus)
 
             tvName.text = "${item.emoji} ${item.name}"
             tvPrice.text = "Rs. ${item.price}"
@@ -136,16 +156,39 @@ class OrderFragment : Fragment() {
 
             val row = LinearLayout(requireContext())
             row.orientation = LinearLayout.HORIZONTAL
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT)
+            params.bottomMargin = 6
+            row.layoutParams = params
 
             val nameView = TextView(requireContext())
-            nameView.text = "${item.name} x$qty"
-            nameView.layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+            nameView.text = "${item.emoji} ${item.name} x$qty"
+            nameView.layoutParams = LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+            nameView.textSize = 13f
 
             val priceView = TextView(requireContext())
             priceView.text = "Rs. $subtotal"
+            priceView.textSize = 13f
+            priceView.setPadding(8, 0, 8, 0)
+
+            val removeBtn = Button(requireContext())
+            removeBtn.text = "✕"
+            removeBtn.textSize = 11f
+            val btnParams = LinearLayout.LayoutParams(70, 60)
+            removeBtn.layoutParams = btnParams
+            removeBtn.setBackgroundColor(0xFFE24B4A.toInt())
+            removeBtn.setTextColor(0xFFFFFFFF.toInt())
+            removeBtn.setOnClickListener {
+                cart.remove(itemId)
+                buildMenuGrid(menuItems)
+                updateSummary()
+            }
 
             row.addView(nameView)
             row.addView(priceView)
+            row.addView(removeBtn)
             summaryLayout.addView(row)
         }
 
@@ -161,37 +204,35 @@ class OrderFragment : Fragment() {
 
         binding.btnPlaceOrder.setOnClickListener {
             if (cart.isEmpty()) {
-                Toast.makeText(requireContext(), "Please select items first!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),
+                    "Please select items first!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val isTableOrder = binding.rbTable.isChecked
-            val customerName = binding.etCustomerName.text.toString()
+            val customerName = binding.etCustomerName?.text.toString()
 
             if (!isTableOrder && customerName.isEmpty()) {
-                Toast.makeText(requireContext(), "Please enter customer name!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),
+                    "Please enter customer name!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             var total = 0
-            val orderItems = mutableListOf<OrderItem>()
+            val orderItems = mutableListOf<FirebaseOrderItem>()
 
             cart.forEach { (itemId, qty) ->
                 val item = menuItems.find { it.id == itemId } ?: return@forEach
                 val subtotal = item.price * qty
                 total += subtotal
-                orderItems.add(
-                    OrderItem(
-                        orderId = 0,
-                        menuItemId = item.id,
-                        menuItemName = item.name,
-                        quantity = qty,
-                        priceEach = item.price
-                    )
-                )
+                orderItems.add(FirebaseOrderItem(
+                    menuItemName = item.name,
+                    quantity = qty,
+                    priceEach = item.price
+                ))
             }
 
-            val order = Order(
+            val order = FirebaseOrder(
                 orderType = if (isTableOrder) "table" else "open",
                 tableNumber = if (isTableOrder) selectedTable else null,
                 customerName = if (!isTableOrder) customerName else null,
@@ -200,11 +241,6 @@ class OrderFragment : Fragment() {
             )
 
             viewModel.placeOrder(order, orderItems)
-            Toast.makeText(requireContext(), "Order placed! Total: Rs. $total", Toast.LENGTH_LONG).show()
-            cart.clear()
-            buildMenuGrid(menuItems)
-            updateSummary()
-            binding.etNote.setText("")
         }
     }
 

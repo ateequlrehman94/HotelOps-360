@@ -82,19 +82,111 @@
                     android:textSize="14sp"
                     android:layout_marginBottom="6dp"/>
 
-                <HorizontalScrollView
+                <!-- First Row T1-T4 -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
 
-                    <LinearLayout
-                        android:id="@+id/tableButtonsLayout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                    <Button
+                        android:id="@+id/btnT1"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="3dp"
+                        android:text="T1"
+                        android:textSize="13sp"
+                        android:backgroundTint="#EEEEEE"
+                        android:textColor="#000000"/>
 
-                        />
+                    <Button
+                        android:id="@+id/btnT2"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="3dp"
+                        android:text="T2"
+                        android:textSize="13sp"
+                        android:backgroundTint="#EEEEEE"
+                        android:textColor="#000000"/>
 
-                </HorizontalScrollView>
+                    <Button
+                        android:id="@+id/btnT3"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="3dp"
+                        android:text="T3"
+                        android:textSize="13sp"
+                        android:backgroundTint="#EEEEEE"
+                        android:textColor="#000000"/>
+
+                    <Button
+                        android:id="@+id/btnT4"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="3dp"
+                        android:text="T4"
+                        android:textSize="13sp"
+                        android:backgroundTint="#EEEEEE"
+                        android:textColor="#000000"/>
+
+                </LinearLayout>
+
+                <!-- Second Row T5-T8 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnT5"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="3dp"
+                        android:text="T5"
+                        android:textSize="13sp"
+                        android:backgroundTint="#EEEEEE"
+                        android:textColor="#000000"/>
+
+                    <Button
+                        android:id="@+id/btnT6"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="3dp"
+                        android:text="T6"
+                        android:textSize="13sp"
+                        android:backgroundTint="#EEEEEE"
+                        android:textColor="#000000"/>
+
+                    <Button
+                        android:id="@+id/btnT7"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="3dp"
+                        android:text="T7"
+                        android:textSize="13sp"
+                        android:backgroundTint="#EEEEEE"
+                        android:textColor="#000000"/>
+
+                    <Button
+                        android:id="@+id/btnT8"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="3dp"
+                        android:text="T8"
+                        android:textSize="13sp"
+                        android:backgroundTint="#EEEEEE"
+                        android:textColor="#000000"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
             <!-- Customer Name (for open orders) -->

@@ -123,38 +123,83 @@ class ExpenseFragment : Fragment() {
 
         val etName = addField("Item Name (e.g. Chicken)")
         val etQty = addField("Quantity (e.g. 25)",
-            android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL)
+            android.text.InputType.TYPE_CLASS_NUMBER or
+                    android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL)
         val etUnit = addField("Unit (kg / litre / piece)")
-        val etPrice = addField("Price per unit (optional)",
+        val etPricePerUnit = addField("Price Per Unit (Rs.)",
             android.text.InputType.TYPE_CLASS_NUMBER)
-        val etTotal = addField("Total Cost (Rs.)", android.text.InputType.TYPE_CLASS_NUMBER)
+
+        val tvTotalLabel = TextView(requireContext())
+        tvTotalLabel.text = "Total Cost (Auto calculated):"
+        tvTotalLabel.setTextColor(0xFF533AB7.toInt())
+        layout.addView(tvTotalLabel)
+
+        val tvTotalAmount = TextView(requireContext())
+        tvTotalAmount.text = "Rs. 0"
+        tvTotalAmount.textSize = 18f
+        tvTotalAmount.setTextColor(0xFF533AB7.toInt())
+        tvTotalAmount.typeface = android.graphics.Typeface.DEFAULT_BOLD
+        layout.addView(tvTotalAmount)
+
+        val tvManualLabel = TextView(requireContext())
+        tvManualLabel.text = "Or enter Total Cost manually:"
+        layout.addView(tvManualLabel)
+
+        val etManualTotal = addField("Total Cost (Rs.) — optional",
+            android.text.InputType.TYPE_CLASS_NUMBER)
+
         val etSupplier = addField("Supplier (optional)")
         val etNote = addField("Note (optional)")
+
+        // Auto calculate total when qty or price changes
+        val watcher = object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val qty = etQty.text.toString().toDoubleOrNull() ?: 0.0
+                val price = etPricePerUnit.text.toString().toIntOrNull() ?: 0
+                val total = (qty * price).toInt()
+                if (total > 0) {
+                    tvTotalAmount.text = "Rs. $total"
+                    tvTotalAmount.setTextColor(0xFF1D9E75.toInt())
+                } else {
+                    tvTotalAmount.text = "Rs. 0"
+                    tvTotalAmount.setTextColor(0xFF533AB7.toInt())
+                }
+            }
+        }
+        etQty.addTextChangedListener(watcher)
+        etPricePerUnit.addTextChangedListener(watcher)
 
         AlertDialog.Builder(requireContext())
             .setTitle("Add Expense / Purchase")
             .setView(layout)
             .setPositiveButton("Add") { _, _ ->
                 val name = etName.text.toString().trim()
-                val total = etTotal.text.toString().toIntOrNull() ?: 0
+                val qty = etQty.text.toString().toDoubleOrNull() ?: 0.0
+                val pricePerUnit = etPricePerUnit.text.toString().toIntOrNull() ?: 0
+                val autoTotal = (qty * pricePerUnit).toInt()
+                val manualTotal = etManualTotal.text.toString().toIntOrNull() ?: 0
+                val total = if (manualTotal > 0) manualTotal else autoTotal
+
                 if (name.isEmpty() || total <= 0) {
                     Toast.makeText(requireContext(),
-                        "Name and total cost are required!", Toast.LENGTH_SHORT).show()
+                        "Name and total cost required!", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
                 val expense = Expense(
                     category = spinner.selectedItem.toString(),
                     itemName = name,
-                    quantity = etQty.text.toString().toDoubleOrNull() ?: 0.0,
+                    quantity = qty,
                     unit = etUnit.text.toString().trim(),
                     totalCost = total,
-                    pricePerUnit = etPrice.text.toString().toIntOrNull() ?: 0,
+                    pricePerUnit = pricePerUnit,
                     supplier = etSupplier.text.toString().trim(),
                     note = etNote.text.toString().trim()
                 )
                 viewModel.insertExpense(expense)
                 Toast.makeText(requireContext(),
-                    "✅ Expense added: Rs. $total", Toast.LENGTH_SHORT).show()
+                    "✅ Added: Rs. $total", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null)
             .show()
